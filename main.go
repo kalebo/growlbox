@@ -3,11 +3,10 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
-
-	"bytes"
 
 	"github.com/gorilla/websocket"
 	_ "github.com/mattn/go-sqlite3"
@@ -33,7 +32,7 @@ type Comment struct {
 
 // Cache is the bundled caching and and concurrancy primitive
 type Cache struct {
-	data bytes.Buffer
+	data []byte
 	sync.RWMutex
 }
 
@@ -75,10 +74,11 @@ func (c *Cache) updateCache() {
 		blob.Append(comment.Name, comment.Comment)
 	}
 	blob.Close()
+	fmt.Println(blob.String())
 
 	// Lock the cache and update it
 	c.Lock()
-	c.data = blob.Buffer
+	c.data = blob.Buffer.Bytes()
 	c.Unlock()
 
 }
@@ -86,7 +86,7 @@ func (c *Cache) updateCache() {
 func handleRoot(rw http.ResponseWriter, r *http.Request) {
 	cache.RLock()
 	// return template rendered with cached data
-	rw.Write(cache.data.Bytes())
+	rw.Write(cache.data)
 	cache.RUnlock()
 
 }
