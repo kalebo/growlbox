@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS comment (
 
 // Comment holds the data associated with a comment
 type Comment struct {
-	IP      string
-	Name    string `json:name`
-	Comment string `json:comment`
+	IP      string `json:"ip"`
+	Name    string `json:"name"`
+	Comment string `json:"comment"`
 }
 
 // Cache is the bundled caching and and concurrancy primitive
