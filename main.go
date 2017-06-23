@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -74,7 +73,6 @@ func (c *Cache) updateCache() {
 		blob.Append(comment.Name, comment.Comment)
 	}
 	blob.Close()
-	fmt.Println(blob.String())
 
 	// Lock the cache and update it
 	c.Lock()
@@ -84,6 +82,7 @@ func (c *Cache) updateCache() {
 }
 
 func handleRoot(rw http.ResponseWriter, r *http.Request) {
+	rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 	cache.RLock()
 	// return template rendered with cached data
 	rw.Write(cache.data)
@@ -151,6 +150,8 @@ func main() {
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/ws", handleWebsocket)
 	http.HandleFunc("/post", handlePost)
+
+	cache.updateCache()
 
 	http.ListenAndServe(":4758", nil)
 }
